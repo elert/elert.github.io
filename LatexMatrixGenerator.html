@@ -1,0 +1,228 @@
+<html>
+    <head>
+    
+        <title> Latex Matrix Generator </title>
+        <style>
+
+            table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                margin-bottom: 10px;
+                min-width: 20px;
+            }
+
+            body { background: lightgray !important; } 
+
+            textarea {
+                font-family: "courier" !important;
+                resize: none;
+                width = 10%;
+            }
+
+        </style>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    </head>
+
+    <body>
+    
+        <div class = "container" width = 500px>
+            <h2> Latex Matrix Generator </h2>
+
+            <div class = row>
+
+                Rows: 
+                <td> <input type = "text" id = "mField" size = 1/> </td>
+
+                Columns:  
+                <td> <input type = "text" id = "nField" size = 1/> </td>
+
+                <button onclick = "updateTableDimensions()" class = "btn">Update Dimesions</button>
+            </div>
+            <div class = row>
+
+                <form action="">
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="bmatrix" checked> Brackets<br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="pmatrix"> Parenthesis<br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="vmatrix"> Vertical Bars<br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="Vmatrix"> Double Vertical Bars<br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="Bmatrix"> Braces <br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="matrix"> Plain<br>
+                    </label>
+
+                    <label class="radio-inline">
+                        <input type="radio" name = "matrixType" id="matrixType" value="smallmatrix"> Small<br>
+                    </label>
+                    
+                </form>
+            </div>
+          
+        </div>
+        
+        <div class = "container">
+            <div class = "row">
+                <table id = "matrixTable">
+                </table>
+                
+                    <button onclick = "getLatex()" class = "btn btn-primary" style="margin-bottom: 5px">Generate Latex</button>
+                
+
+                
+            </div>
+        </div>
+        <div class = "container">
+            <div class = "row">
+
+                <textarea id = "latexArea" rows = "2" style = "width: 80%"></textarea>
+            </div>
+
+            Created by Eric Elert. Last Updated 11/3/17
+        </div>
+
+    </body>
+
+
+    <script type="text/javascript">
+        
+        var numRows = 5;
+        var numColumns = 5;
+
+
+        //document.getElementById("matrixTable").innerHTML = getTableHTML(2,2);
+        //document.getElementById("table_1_1").
+
+        updateTableDimensions();
+        getLatex();
+
+
+
+
+        function getTableHTML(n, m) {
+            var tableHTML = "<tr> <td/>";
+
+            for (i = 0; i < n; i ++) {
+                tableHTML += "<td align = 'center'>";
+                tableHTML += (i + 1);
+                tableHTML += "</td>";
+            }
+
+            for (i = 0; i < m; i ++) {
+
+                tableHTML += "<tr> <td align = 'center'>";
+                tableHTML += (i + 1);
+                tableHTML += "</td>";
+
+                for (j = 0; j < n; j ++) {
+                    tableHTML += "<td> <input type = 'text' id = 'table_";
+                    tableHTML += i;
+                    tableHTML += "_";
+                    tableHTML += j;
+                    tableHTML += "'";
+                    //tableHTML += "value = '";
+                    //tableHTML += "a_{"
+                    //tableHTML += i + 1;
+                    //tableHTML += j + 1;
+                    //tableHTML += "}'"
+                    tableHTML += "size = '2'> </td>";
+                }
+                tableHTML += "</tr>";
+            }
+
+            return tableHTML;
+        }
+
+        function updateTableDimensions() {
+
+            var m = numRows;
+            var n = numColumns;
+
+            var inputN = document.getElementById("nField").value;
+            var inputM = document.getElementById("mField").value;
+
+            if (!isNaN(inputN) && parseInt(Number(inputN)) == inputN && //checking to see if inputs are integers
+         !isNaN(parseInt(inputN, 10)))
+                n = Number(inputN);
+
+            if (!isNaN(inputM) && parseInt(Number(inputM)) == inputM && 
+         !isNaN(parseInt(inputM, 10)))
+                m = Number(inputM);
+
+            numRows = m;
+            numColumns = n;
+
+            document.getElementById("mField").value = numRows;
+            document.getElementById("nField").value = numColumns;
+
+            document.getElementById("matrixTable").innerHTML = getTableHTML(n,m);
+
+            //getLatex();
+        }
+
+        function getLatex() {
+
+            var elementID;
+            var matrixType = document.querySelector('input[name="matrixType"]:checked').value;
+           
+            var c = "\\begin {";
+            c += matrixType;
+            c += "}\n";
+            
+            for (i = 0; i < numRows; i ++) {
+                c += "\t";
+                for (j = 0; j < numColumns; j ++) {
+
+                    elementID = "table_" + i + "_" + j;
+                    c += document.getElementById(elementID).value;
+
+                    if (j != numColumns - 1)
+                        c += " & ";
+                    else
+                        c += " \\\\";
+                }
+                c += "\n";
+            }
+
+            c += "\\end {";
+            c += matrixType;    
+            c += "}";
+
+
+            document.getElementById("latexArea").rows = (numRows + 2);
+
+            var numRowsInTextArea = numRows + 2;
+            document.getElementById("latexArea").rows = numRowsInTextArea;
+
+
+            document.getElementById("latexArea").value = c;
+
+        }
+
+        
+
+
+    </script>
+
+
+</html>
+
